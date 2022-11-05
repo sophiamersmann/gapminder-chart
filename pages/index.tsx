@@ -1,10 +1,11 @@
 import Head from 'next/head';
 import { GetStaticProps, NextPage } from 'next';
-
 import { csvParse } from 'd3-dsv';
 
-import { readFileSync } from '../lib/utils';
-import type { DataRow } from '../types/data';
+import GapminderChart from '../components/GapminderChart/GapminderChart';
+
+import { readFileSync } from '../lib/server';
+import type { DataRow } from '../types';
 
 export const getStaticProps: GetStaticProps = async (_context) => {
   // read data upfront (at build time)
@@ -38,7 +39,14 @@ const IndexPage: NextPage<IndexProps> = ({ data }: IndexProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>Hello world!</main>
+      <main>
+        <hgroup>
+          <h1>Heading</h1>
+          <p>Subtitle</p>
+        </hgroup>
+
+        <GapminderChart data={data} />
+      </main>
     </div>
   );
 };

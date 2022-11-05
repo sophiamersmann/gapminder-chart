@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+export function px(s: any) {
+  return `${s}px`;
+}
 
-export function readFileSync(relativePath: string) {
-  const absolutePath = path.join(process.cwd(), relativePath);
-  return fs.readFileSync(absolutePath, 'utf8');
+export function translate(x: number, y: number) {
+  return `translate(${x}, ${y})`;
 }

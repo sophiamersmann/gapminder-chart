@@ -1,0 +1,36 @@
+.axis {
+  --color: var(--c-gray-400);
+  --color-mute: var(--c-gray-300);
+}
+
+.tick line {
+  stroke: var(--color);
+}
+
+.tick line.mute {
+  stroke: var(--color-mute);
+}
+
+.tick text {
+  font-size: var(--font-size-sm);
+  fill: var(--color);
+}
+
+.label,
+.label text {
+  font-weight: var(--font-weight-bold);
+  fill: var(--color);
+  font-size: var(--font-size-sm);
+}
+
+.connector {
+  stroke: var(--color);
+}
+
+.axisX .tick text {
+  text-anchor: middle;
+}
+
+.axisX .label {
+  text-anchor: end;
+}
