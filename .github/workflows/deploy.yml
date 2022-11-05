@@ -1,0 +1,32 @@
+name: Deploy to GitHub pages
+
+on:
+  # trigger when pushing to main
+  push:
+    branches:
+      - main
+  # trigger manually
+  workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Install
+        run: npm ci
+
+      - name: Export
+        run: npm run export
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: out

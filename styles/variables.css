@@ -1,0 +1,49 @@
+:root {
+  /* spacing (px) */
+  --s-px-1: 4px;
+  --s-px-2: 8px;
+  --s-px-3: 12px;
+  --s-px-4: 16px;
+  --s-px-5: 24px;
+  --s-px-6: 32px;
+  --s-px-7: 48px;
+  --s-px-8: 64px;
+
+  /* spacing (rem) */
+  --s-rem-1: 0.25rem; /* 4px */
+  --s-rem-2: 0.5rem; /* 8px */
+  --s-rem-3: 0.75rem; /* 12px */
+  --s-rem-4: 1rem; /* 16px */
+  --s-rem-5: 1.5rem; /* 24px */
+  --s-rem-6: 2rem; /* 32px */
+  --s-rem-7: 3rem; /* 48px */
+  --s-rem-8: 4rem; /* 64px */
+
+  /* font size */
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.375rem; /* 18px */
+
+  /* line height */
+  --line-height-tight: 1.15;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+
+  /* font weight */
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* grays (from tailwind: https://tailwindcss.com/docs/customizing-colors) */
+  --c-gray-50: #f8fafc;
+  --c-gray-100: #f1f5f9;
+  --c-gray-200: #e2e8f0;
+  --c-gray-300: #cbd5e1;
+  --c-gray-400: #94a3b8;
+  --c-gray-500: #64748b;
+  --c-gray-600: #475569;
+  --c-gray-700: #334155;
+  --c-gray-800: #1e293b;
+  --c-gray-900: #0f172a;
+  --c-black: var(--c-gray-900);
+}
