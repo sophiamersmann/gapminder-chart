@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { extent, max, descending } from 'd3-array';
 import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
@@ -57,11 +58,17 @@ export default function GapminderChart({
 
   // data
   const mostRecentYear = max(data, (d) => d.year);
-  const mostRecentData = data
-    .filter((d) => d.year === mostRecentYear)
-    .sort((a, b) => descending(a.population, b.population));
-  const highlightedData = mostRecentData.filter((d) =>
-    highlightedCountries.includes(d.country)
+  const mostRecentData = useMemo(
+    () =>
+      data
+        .filter((d) => d.year === mostRecentYear)
+        .sort((a, b) => descending(a.population, b.population)),
+    [data, mostRecentYear]
+  );
+  const highlightedData = useMemo(
+    () =>
+      mostRecentData.filter((d) => highlightedCountries.includes(d.country)),
+    [mostRecentData, highlightedCountries]
   );
 
   // ticks
@@ -85,7 +92,7 @@ export default function GapminderChart({
             ticks={minorTicksX}
             majorTicks={majorTicksX}
             y={dms.boundedHeight}
-            format={(tick) => tick / 1000 + 'k'}
+            format={(tick) => '$' + tick / 1000 + 'k'}
           />
 
           <g>
@@ -98,6 +105,7 @@ export default function GapminderChart({
                 stroke="white"
                 strokeWidth="0.5"
                 fill={color(d)}
+                fillOpacity="0.8"
               ></circle>
             ))}
           </g>
@@ -109,7 +117,7 @@ export default function GapminderChart({
             dy="-8"
             xAlign="right"
           >
-            Wealth (GDP per capita)
+            Income per person (GDP per capita)
           </Label>
           <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
             {tickFormatY(maxTickY)} years
