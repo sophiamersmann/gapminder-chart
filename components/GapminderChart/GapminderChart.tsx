@@ -4,6 +4,7 @@ import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
 import Label from '../Axis/Label';
+import Annotation from '../Annotation/Annotation';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
 import { translate } from '../../lib/utils';
@@ -13,6 +14,7 @@ import styles from './GapminderChart.module.css';
 
 interface Props {
   data: DataRow[];
+  highlightedCountries?: string[];
   domainX?: [number, number];
   domainY?: [number, number];
   domainR?: [number, number];
@@ -25,6 +27,7 @@ interface Props {
 
 export default function GapminderChart({
   data,
+  highlightedCountries = [],
   domainX,
   domainY,
   domainR,
@@ -57,6 +60,9 @@ export default function GapminderChart({
   const mostRecentData = data
     .filter((d) => d.year === mostRecentYear)
     .sort((a, b) => descending(a.population, b.population));
+  const highlightedData = mostRecentData.filter((d) =>
+    highlightedCountries.includes(d.country)
+  );
 
   // ticks
   ticksY = ticksY || yScale.ticks();
@@ -111,6 +117,21 @@ export default function GapminderChart({
               Life expectancy
             </tspan>
           </Label>
+
+          {/* annotate given countries */}
+          {highlightedData.map((d) => (
+            <Annotation
+              key={d.country}
+              x={xScale(d.gdp)}
+              y={yScale(d.lifeExpectancy)}
+              r={rScale(d.population)}
+              position={
+                d.country === 'China' || d.country === 'India' ? 'top' : 'right'
+              }
+            >
+              {d.country}
+            </Annotation>
+          ))}
         </g>
       </svg>
     </div>

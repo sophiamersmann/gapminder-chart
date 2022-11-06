@@ -87,6 +87,17 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
 
         <GapminderChart
           data={data}
+          highlightedCountries={[
+            'China',
+            'India',
+            'Russia',
+            'United States',
+            'Equatorial Guinea',
+            'Nigeria',
+            'North Korea',
+            'Central African Republic',
+            'Qatar',
+          ]}
           domainX={[500, 200000]}
           domainY={[10, max(data, (d) => d.lifeExpectancy) as number]}
           rangeR={[4, 40]}

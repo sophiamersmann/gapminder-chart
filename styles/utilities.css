@@ -20,3 +20,20 @@
     var(--text-outline) 2.4476890563964844px -1.734594702720642px 0px,
     var(--text-outline) 2.8805108070373535px -0.8382465243339539px 0px;
 }
+
+.text-outline-sm {
+  --text-outline: #ffffff;
+  text-shadow: var(--text-outline) 2px 0px 0px,
+    var(--text-outline) 1.75517px 0.958851px 0px,
+    var(--text-outline) 1.0806px 1.68294px 0px,
+    var(--text-outline) 0.141474px 1.99499px 0px,
+    var(--text-outline) -0.832294px 1.81859px 0px,
+    var(--text-outline) -1.60229px 1.19694px 0px,
+    var(--text-outline) -1.97998px 0.28224px 0px,
+    var(--text-outline) -1.87291px -0.701566px 0px,
+    var(--text-outline) -1.30729px -1.5136px 0px,
+    var(--text-outline) -0.421592px -1.95506px 0px,
+    var(--text-outline) 0.567324px -1.91785px 0px,
+    var(--text-outline) 1.41734px -1.41108px 0px,
+    var(--text-outline) 1.92034px -0.558831px 0px;
+}
