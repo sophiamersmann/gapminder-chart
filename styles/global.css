@@ -17,6 +17,7 @@ body {
 main {
   max-width: 800px;
   margin: 0 auto;
+  padding: var(--s-rem-1) var(--s-px-1);
 }
 
 h1,
@@ -54,3 +55,5 @@ table {
 :focus:not(:focus-visible) {
   outline: none;
 }
+
+@import 'utilities.css';
