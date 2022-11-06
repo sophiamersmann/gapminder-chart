@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  basePath: '/gapminder-chart',
+  basePath: process.env.BASE_PATH,
 };
 
 module.exports = nextConfig;
