@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { extent, max, descending } from 'd3-array';
+import { extent, max, descending, ascending } from 'd3-array';
 import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
 import AxisX from '../Axis/AxisX';
@@ -15,6 +15,7 @@ import styles from './GapminderChart.module.css';
 
 interface Props {
   data: DataRow[];
+  year?: number;
   highlightedCountries?: string[];
   domainX?: [number, number];
   domainY?: [number, number];
@@ -29,6 +30,7 @@ interface Props {
 export default function GapminderChart({
   data,
   highlightedCountries = [],
+  year,
   domainX,
   domainY,
   domainR,
@@ -39,7 +41,7 @@ export default function GapminderChart({
   color = () => 'var(--c-blue)',
 }: Props) {
   // dimensions
-  const margins = { bottom: 20, left: 20 };
+  const margins = { bottom: 20, left: 20, right: 60 };
   const { ref, dimensions: dms } = useChartDimensions<HTMLDivElement>(margins);
 
   // scales
@@ -56,19 +58,25 @@ export default function GapminderChart({
     .domain(domainR || (extent(data, (d) => d.population) as [number, number]))
     .range(rangeR || [2, 10]);
 
-  // data
-  const mostRecentYear = max(data, (d) => d.year);
-  const mostRecentData = useMemo(
+  // if no year given, grab the most recent one
+  year = year || max(data, (d) => d.year);
+
+  // filter data for the given year
+  const displayData = useMemo(
     () =>
       data
-        .filter((d) => d.year === mostRecentYear)
+        .filter((d) => d.year === year)
         .sort((a, b) => descending(a.population, b.population)),
-    [data, mostRecentYear]
+    [data, year]
   );
+
+  // get data for each country to highlight
   const highlightedData = useMemo(
     () =>
-      mostRecentData.filter((d) => highlightedCountries.includes(d.country)),
-    [mostRecentData, highlightedCountries]
+      displayData
+        .filter((d) => highlightedCountries.includes(d.country))
+        .sort((a, b) => ascending(a.population, b.population)),
+    [displayData, highlightedCountries]
   );
 
   // ticks
@@ -96,7 +104,7 @@ export default function GapminderChart({
           />
 
           <g>
-            {mostRecentData.map((d) => (
+            {displayData.map((d) => (
               <circle
                 key={d.country}
                 cx={xScale(d.gdp)}
@@ -121,7 +129,7 @@ export default function GapminderChart({
           </Label>
           <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
             {tickFormatY(maxTickY)} years
-            <tspan x={-dms.margins.left} dy="1.15em">
+            <tspan x={-dms.margins.left} dy="1.1em">
               Life expectancy
             </tspan>
           </Label>
