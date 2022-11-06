@@ -2,14 +2,16 @@ import Head from 'next/head';
 import { GetStaticProps, NextPage } from 'next';
 import { csvParse } from 'd3-dsv';
 import { max } from 'd3-array';
+import { scaleOrdinal } from 'd3-scale';
 
 import GapminderChart from '../components/GapminderChart/GapminderChart';
 
 import { readFileSync } from '../lib/server';
 import type { DataRow } from '../types';
 
+// read data upfront (at build time)
 export const getStaticProps: GetStaticProps = async (_context) => {
-  // read data upfront (at build time)
+  // GDP, life expectance and population by country and year
   const data = csvParse<
     DataRow,
     'country' | 'year' | 'gdp_per_capita' | 'life_expectancy' | 'population'
@@ -21,18 +23,43 @@ export const getStaticProps: GetStaticProps = async (_context) => {
     population: +(d.population as string),
   }));
 
+  // continents by country
+  const continents = csvParse<'country' | 'continent'>(
+    readFileSync('data/continent-by-country.csv')
+  );
+
   return {
     props: {
       data: data,
+      continents: continents,
     },
   };
 };
 
 interface IndexProps {
   data: DataRow[];
+  continents: { country: string; continent: string }[];
 }
 
-const IndexPage: NextPage<IndexProps> = ({ data }: IndexProps) => {
+const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
+  const uniqueContinents = new Set(continents.map((d) => d.continent));
+
+  // quick access to a country's continent
+  const continentMap = new Map(continents.map((d) => [d.country, d.continent]));
+
+  const color = scaleOrdinal<string, string>()
+    .domain(uniqueContinents)
+    .range([
+      'var(--c-blue)',
+      'var(--c-turquoise)',
+      'var(--c-green)',
+      'var(--c-beige)',
+      'var(--c-yellow)',
+      'var(--c-red)',
+      'var(--c-purple)',
+    ])
+    .unknown('var(--c-black)');
+
   return (
     <div>
       <Head>
@@ -57,6 +84,7 @@ const IndexPage: NextPage<IndexProps> = ({ data }: IndexProps) => {
           ]}
           majorTicksX={[1000, 10000, 100000]}
           ticksY={[20, 30, 40, 50, 60, 70, 80, 90]}
+          color={(d: DataRow) => color(continentMap.get(d.country) as string)}
         />
       </main>
     </div>

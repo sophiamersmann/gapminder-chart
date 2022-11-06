@@ -20,6 +20,7 @@ interface Props {
   minorTicksX?: number[];
   majorTicksX?: number[];
   ticksY?: number[];
+  color?: (d: DataRow) => string;
 }
 
 export default function GapminderChart({
@@ -31,6 +32,7 @@ export default function GapminderChart({
   minorTicksX,
   majorTicksX,
   ticksY,
+  color = () => 'var(--c-blue)',
 }: Props) {
   // dimensions
   const margins = { bottom: 20, left: 20 };
@@ -87,8 +89,8 @@ export default function GapminderChart({
                 cx={xScale(d.gdp)}
                 cy={yScale(d.lifeExpectancy)}
                 r={rScale(d.population)}
-                stroke="orange"
-                fill="orange"
+                stroke={color(d)}
+                fill={color(d)}
                 fillOpacity="0.3"
               ></circle>
             ))}

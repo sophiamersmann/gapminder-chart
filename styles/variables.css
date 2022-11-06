@@ -46,4 +46,13 @@
   --c-gray-800: #1e293b;
   --c-gray-900: #0f172a;
   --c-black: var(--c-gray-900);
+
+  /* colors */
+  --c-blue: #4a9dd9;
+  --c-turquoise: #1f767a;
+  --c-green: #98cdaa;
+  --c-beige: #aaa493;
+  --c-yellow: #f2a335;
+  --c-red: #ea693e;
+  --c-purple: #4c3562;
 }
