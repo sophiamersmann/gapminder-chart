@@ -1,0 +1,25 @@
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-px-1);
+  margin: var(--s-rem-5) 0;
+  color: var(--c-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.legend .item {
+  display: inline-flex;
+  line-height: 1;
+  white-space: nowrap;
+  margin-right: var(--s-px-2);
+}
+
+.legend .item .shape {
+  --size: 0.9em;
+
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  margin-right: var(--s-px-1);
+}

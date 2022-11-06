@@ -5,6 +5,8 @@ import { max } from 'd3-array';
 import { scaleOrdinal } from 'd3-scale';
 
 import GapminderChart from '../components/GapminderChart/GapminderChart';
+import Legend from '../components/Legend/Legend';
+import LegendItem from '../components/Legend/LegendItem';
 
 import { readFileSync } from '../lib/server';
 import type { DataRow } from '../types';
@@ -42,22 +44,24 @@ interface IndexProps {
 }
 
 const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
-  const uniqueContinents = new Set(continents.map((d) => d.continent));
-
   // quick access to a country's continent
   const continentMap = new Map(continents.map((d) => [d.country, d.continent]));
 
+  // hand-pick continent colors (and their order)
+  const continentColors = [
+    { continent: 'Africa', color: 'var(--c-purple)' },
+    { continent: 'Asia', color: 'var(--c-red)' },
+    { continent: 'Oceania', color: 'var(--c-yellow)' },
+    { continent: 'North America', color: 'var(--c-turquoise)' },
+    { continent: 'South America', color: 'var(--c-green)' },
+    { continent: 'Europe', color: 'var(--c-blue)' },
+    { continent: 'Antarctica', color: 'var(--c-beige)' },
+  ];
+
+  const uniqueContinents = continentColors.map((d) => d.continent);
   const color = scaleOrdinal<string, string>()
     .domain(uniqueContinents)
-    .range([
-      'var(--c-blue)',
-      'var(--c-turquoise)',
-      'var(--c-green)',
-      'var(--c-beige)',
-      'var(--c-yellow)',
-      'var(--c-red)',
-      'var(--c-purple)',
-    ])
+    .range(continentColors.map((d) => d.color))
     .unknown('var(--c-black)');
 
   return (
@@ -72,6 +76,14 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           <h1>Heading</h1>
           <p>Subtitle</p>
         </hgroup>
+
+        <Legend>
+          {uniqueContinents.map((continent) => (
+            <LegendItem key={continent} color={color(continent)}>
+              {continent}
+            </LegendItem>
+          ))}
+        </Legend>
 
         <GapminderChart
           data={data}

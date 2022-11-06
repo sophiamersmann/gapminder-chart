@@ -6,7 +6,7 @@ import AxisY from '../Axis/AxisY';
 import Label from '../Axis/Label';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
-import { px, translate } from '../../lib/utils';
+import { translate } from '../../lib/utils';
 import type { DataRow } from '../../types';
 
 import styles from './GapminderChart.module.css';
@@ -89,9 +89,9 @@ export default function GapminderChart({
                 cx={xScale(d.gdp)}
                 cy={yScale(d.lifeExpectancy)}
                 r={rScale(d.population)}
-                stroke={color(d)}
+                stroke="white"
+                strokeWidth="0.5"
                 fill={color(d)}
-                fillOpacity="0.3"
               ></circle>
             ))}
           </g>
