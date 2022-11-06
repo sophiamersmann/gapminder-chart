@@ -67,23 +67,35 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
   return (
     <div>
       <Head>
-        <title>Gapminder Chart</title>
+        <title>Gapminder Chart: Health and Wealth of Nations</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
-        <hgroup>
-          <h1>Heading</h1>
+        <hgroup style={{ marginBottom: 'var(--s-rem-3)' }}>
+          <h1>Health and Wealth of Nations</h1>
           <p>Subtitle</p>
         </hgroup>
 
-        <Legend>
-          {uniqueContinents.map((continent) => (
-            <LegendItem key={continent} color={color(continent)}>
-              {continent}
-            </LegendItem>
-          ))}
-        </Legend>
+        <div
+          style={{
+            marginBottom: 'var(--s-rem-5)',
+            color: 'var(--c-gray-500)',
+            fontSize: 'var(--font-size-sm)',
+          }}
+        >
+          <Legend>
+            {uniqueContinents.map((continent) => (
+              <LegendItem key={continent} color={color(continent)}>
+                {continent}
+              </LegendItem>
+            ))}
+          </Legend>
+
+          <p style={{ lineHeight: 1, marginTop: 'var(--s-rem-1)' }}>
+            Circles sized by population estimates
+          </p>
+        </div>
 
         <GapminderChart
           data={data}
@@ -109,6 +121,20 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           ticksY={[20, 30, 40, 50, 60, 70, 80, 90]}
           color={(d: DataRow) => color(continentMap.get(d.country) as string)}
         />
+
+        <p
+          style={{
+            fontSize: 'var(--font-size-xs)',
+            color: 'var(--c-gray-400)',
+            lineHeight: 1,
+            marginTop: 'var(--s-rem-2)',
+          }}
+        >
+          Source:{' '}
+          <a href="https://www.gapminder.org/" rel="noreferrer">
+            Gapminder
+          </a>
+        </p>
       </main>
     </div>
   );

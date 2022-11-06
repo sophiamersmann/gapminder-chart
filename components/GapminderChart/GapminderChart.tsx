@@ -125,7 +125,7 @@ export default function GapminderChart({
             dy="-8"
             xAlign="right"
           >
-            Income per person (GDP per capita)
+            Income per person
           </Label>
           <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
             {tickFormatY(maxTickY)} years

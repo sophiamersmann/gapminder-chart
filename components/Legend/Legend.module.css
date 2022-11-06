@@ -2,7 +2,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-px-1);
-  margin: var(--s-rem-5) 0;
   color: var(--c-gray-500);
   font-size: var(--font-size-sm);
 }

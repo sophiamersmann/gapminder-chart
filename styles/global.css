@@ -20,10 +20,6 @@ main {
   padding: var(--s-rem-1) var(--s-px-1);
 }
 
-hgroup {
-  margin-bottom: 1em;
-}
-
 h1,
 h2,
 h3,
