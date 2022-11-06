@@ -10,7 +10,8 @@ interface Margins {
 }
 
 const useChartDimensions = <E extends HTMLElement>(
-  passedMargins: Partial<Margins> = {}
+  passedMargins: Partial<Margins> = {},
+  { ratio = 16 / 9, minHeight = 300, maxHeight = 400 } = {}
 ) => {
   const ref = useRef<E>(null);
 
@@ -23,7 +24,6 @@ const useChartDimensions = <E extends HTMLElement>(
   };
 
   const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
 
   useEffect(() => {
     const element = ref.current as E;
@@ -35,7 +35,6 @@ const useChartDimensions = <E extends HTMLElement>(
 
         const entry = entries[0];
         setWidth(entry.contentRect.width);
-        setHeight(entry.contentRect.height);
       }
     );
 
@@ -43,6 +42,9 @@ const useChartDimensions = <E extends HTMLElement>(
 
     return () => resizeObserver.unobserve(element);
   }, []);
+
+  // maintain given ratio between width and height (within bounds)
+  const height = Math.min(Math.max((1 / ratio) * width, minHeight), maxHeight);
 
   const dimensions = {
     margins,

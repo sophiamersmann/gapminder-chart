@@ -32,7 +32,6 @@ export default function GapminderChart({
   ticksY,
 }: Props) {
   // dimensions
-  const height = 400;
   const margins = { bottom: 20, left: 20 };
   const { ref, dimensions: dms } = useChartDimensions<HTMLDivElement>(margins);
 
@@ -57,7 +56,7 @@ export default function GapminderChart({
     .sort((a, b) => descending(a.population, b.population));
 
   return (
-    <div ref={ref} style={{ height: px(height) }}>
+    <div ref={ref}>
       <svg className={styles.svg} width={dms.width} height={dms.height}>
         <g transform={translate(dms.margins.left, dms.margins.top)}>
           <AxisY
