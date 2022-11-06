@@ -3,6 +3,7 @@ import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
 import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
+import Label from '../Axis/Label';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
 import { px, translate } from '../../lib/utils';
@@ -55,20 +56,24 @@ export default function GapminderChart({
     .filter((d) => d.year === mostRecentYear)
     .sort((a, b) => descending(a.population, b.population));
 
+  // ticks
+  ticksY = ticksY || yScale.ticks();
+  const maxTickY = ticksY[ticksY.length - 1];
+  const tickFormatY = (tick: number) => tick.toString();
+
   return (
     <div ref={ref}>
       <svg className={styles.svg} width={dms.width} height={dms.height}>
         <g transform={translate(dms.margins.left, dms.margins.top)}>
           <AxisY
             yScale={yScale}
-            label="Life expectancy"
             ticks={ticksY}
             tickX={-dms.margins.left}
             tickLength={dms.boundedWidth}
+            format={tickFormatY}
           />
           <AxisX
             xScale={xScale}
-            label="Wealth (GDP per capita)"
             ticks={minorTicksX}
             majorTicks={majorTicksX}
             y={dms.boundedHeight}
@@ -88,6 +93,22 @@ export default function GapminderChart({
               ></circle>
             ))}
           </g>
+
+          {/* rendered last to make sure they're are on top of the shapes */}
+          <Label
+            x={dms.boundedWidth}
+            y={dms.boundedHeight}
+            dy="-8"
+            xAlign="right"
+          >
+            Wealth (GDP per capita)
+          </Label>
+          <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
+            {tickFormatY(maxTickY)} years
+            <tspan x={-dms.margins.left} dy="1.15em">
+              Life expectancy
+            </tspan>
+          </Label>
         </g>
       </svg>
     </div>

@@ -6,7 +6,6 @@ import styles from './Axis.module.css';
 
 interface Props {
   xScale: ScaleContinuousNumeric<number, number>;
-  label: ReactNode;
 
   ticks?: number[]; // list of ticks that are marked by a line
   majorTicks?: number[]; // list of ticks that get a label
@@ -20,7 +19,6 @@ export default function AxisX({
   xScale,
   ticks,
   majorTicks,
-  label,
   y = 0,
   format = (tick) => tick.toString(),
   tickLength = 6,
@@ -56,15 +54,6 @@ export default function AxisX({
           </text>
         </Tick>
       ))}
-
-      {/* label */}
-      <text
-        className={[styles.label, 'text-outline'].join(' ')}
-        x={range[1]}
-        dy="-8"
-      >
-        {label}
-      </text>
     </g>
   );
 }

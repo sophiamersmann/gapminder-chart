@@ -6,7 +6,6 @@ import styles from './Axis.module.css';
 
 interface Props {
   yScale: ScaleContinuousNumeric<number, number>;
-  label: ReactNode;
 
   ticks?: number[];
   format?: (tick: number) => string;
@@ -18,39 +17,19 @@ interface Props {
 export default function AxisY({
   yScale,
   ticks,
-  label,
   tickX = 0,
   tickLength = 6,
   format = (tick) => tick.toString(),
 }: Props) {
   if (ticks == undefined) ticks = yScale.ticks();
-  const lastTick = ticks.length > 0 && ticks[ticks.length - 1];
 
   return (
     <g className={[styles.axis, styles.axisY].join(' ')}>
-      {/* all but the last tick */}
-      {ticks.slice(0, -1).map((tick) => (
+      {ticks.map((tick) => (
         <Tick key={tick} x={tickX} y={yScale(tick)} length={tickLength}>
           {format(tick)}
         </Tick>
       ))}
-
-      {/* the last tick serves as label */}
-      {lastTick && (
-        <>
-          <Tick
-            className={[styles.label, 'text-outline'].join(' ')}
-            x={tickX}
-            y={yScale(lastTick)}
-            length={tickLength}
-          >
-            {format(lastTick)} years
-            <tspan x={tickX} dy="1.15em">
-              {label}
-            </tspan>
-          </Tick>
-        </>
-      )}
     </g>
   );
 }
