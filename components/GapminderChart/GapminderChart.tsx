@@ -8,23 +8,47 @@ import useChartDimensions from '../../lib/hooks/useChartDimensions';
 import { px, translate } from '../../lib/utils';
 import type { DataRow } from '../../types';
 
-import cfg from './config';
 import styles from './GapminderChart.module.css';
 
-export default function GapminderChart({ data }: { data: DataRow[] }) {
+interface Props {
+  data: DataRow[];
+  domainX?: [number, number];
+  domainY?: [number, number];
+  domainR?: [number, number];
+  rangeR?: [number, number];
+  minorTicksX?: number[];
+  majorTicksX?: number[];
+  ticksY?: number[];
+}
+
+export default function GapminderChart({
+  data,
+  domainX,
+  domainY,
+  domainR,
+  rangeR,
+  minorTicksX,
+  majorTicksX,
+  ticksY,
+}: Props) {
   // dimensions
   const height = 400;
   const margins = { bottom: 20, left: 20 };
   const { ref, dimensions: dms } = useChartDimensions<HTMLDivElement>(margins);
 
   // scales
-  const xScale = scaleLog().domain(cfg.domainX).range([0, dms.boundedWidth]);
+  const xScale = scaleLog()
+    .domain(domainX || (extent(data, (d) => d.gdp) as [number, number]))
+    .range([0, dms.boundedWidth]);
   const yScale = scaleLinear()
-    .domain([cfg.minDomainY, max(data, (d) => d.lifeExpectancy) as number])
-    .range([dms.boundedHeight, 0]);
+    .domain(
+      domainY || (extent(data, (d) => d.lifeExpectancy) as [number, number])
+    )
+    .range([dms.boundedHeight, 0])
+    .nice();
   const rScale = scaleSqrt()
-    .domain(extent(data, (d) => d.population) as [number, number])
-    .range(cfg.rangeR);
+    .domain(domainR || (extent(data, (d) => d.population) as [number, number]))
+    .range(rangeR || [2, 10]);
 
   // data
   const mostRecentYear = max(data, (d) => d.year);
@@ -39,15 +63,15 @@ export default function GapminderChart({ data }: { data: DataRow[] }) {
           <AxisY
             yScale={yScale}
             label="Life expectancy"
-            ticks={cfg.ticksY}
+            ticks={ticksY}
             tickX={-dms.margins.left}
             tickLength={dms.boundedWidth}
           />
           <AxisX
             xScale={xScale}
             label="Wealth (GDP per capita)"
-            ticks={cfg.ticksX}
-            majorTicks={cfg.majorTicksX}
+            ticks={minorTicksX}
+            majorTicks={majorTicksX}
             y={dms.boundedHeight}
             format={(tick) => tick / 1000 + 'k'}
           />

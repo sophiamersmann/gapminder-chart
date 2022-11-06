@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { GetStaticProps, NextPage } from 'next';
 import { csvParse } from 'd3-dsv';
+import { max } from 'd3-array';
 
 import GapminderChart from '../components/GapminderChart/GapminderChart';
 
@@ -45,7 +46,18 @@ const IndexPage: NextPage<IndexProps> = ({ data }: IndexProps) => {
           <p>Subtitle</p>
         </hgroup>
 
-        <GapminderChart data={data} />
+        <GapminderChart
+          data={data}
+          domainX={[500, 200000]}
+          domainY={[10, max(data, (d) => d.lifeExpectancy) as number]}
+          rangeR={[4, 40]}
+          minorTicksX={[
+            1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000,
+            30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000,
+          ]}
+          majorTicksX={[1000, 10000, 100000]}
+          ticksY={[20, 30, 40, 50, 60, 70, 80, 90]}
+        />
       </main>
     </div>
   );
