@@ -5,7 +5,7 @@ import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
 import Label from '../Axis/Label';
-import Annotation from '../Annotation/Annotation';
+import Scatter from '../Scatter/Scatter';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
 import { translate } from '../../lib/utils';
@@ -17,6 +17,7 @@ interface Props {
   data: DataRow[];
   year?: number;
   annotatedCountries?: string[];
+  highlightedCountry?: string;
   domainX?: [number, number];
   domainY?: [number, number];
   domainR?: [number, number];
@@ -30,6 +31,7 @@ interface Props {
 export default function GapminderChart({
   data,
   annotatedCountries = [],
+  highlightedCountry,
   year,
   domainX,
   domainY,
@@ -70,7 +72,7 @@ export default function GapminderChart({
     [data, year]
   );
 
-  // get data for each country to highlight
+  // get data for annotations
   const annotations = useMemo(
     () =>
       displayData
@@ -78,6 +80,14 @@ export default function GapminderChart({
         .sort((a, b) => ascending(a.population, b.population)),
     [displayData, annotatedCountries]
   );
+
+  // get history data for the country to highlight
+  const historyData = useMemo(() => {
+    if (!highlightedCountry) return;
+    return data
+      .filter((d) => d.country === highlightedCountry)
+      .sort((a, b) => ascending(a.year, b.year));
+  }, [data, highlightedCountry]);
 
   // ticks
   ticksY = ticksY || yScale.ticks();
@@ -103,22 +113,16 @@ export default function GapminderChart({
             format={(tick) => '$' + tick / 1000 + 'k'}
           />
 
-          <g>
-            {displayData.map((d) => (
-              <circle
-                key={d.country}
-                cx={xScale(d.gdp)}
-                cy={yScale(d.lifeExpectancy)}
-                r={rScale(d.population)}
-                stroke="white"
-                strokeWidth="0.5"
-                fill={color(d)}
-                fillOpacity="0.8"
-              ></circle>
-            ))}
-          </g>
+          <Scatter
+            data={displayData}
+            xScale={xScale}
+            yScale={yScale}
+            rScale={rScale}
+            color={color}
+            annotatedCountries={annotatedCountries}
+          />
 
-          {/* rendered last to make sure they're are on top of the shapes */}
+          {/* axis labels, rendered last to make sure they're are on top of the shapes */}
           <Label
             x={dms.boundedWidth}
             y={dms.boundedHeight}
@@ -133,21 +137,6 @@ export default function GapminderChart({
               Life expectancy
             </tspan>
           </Label>
-
-          {/* annotate given countries */}
-          {annotations.map((d) => (
-            <Annotation
-              key={d.country}
-              x={xScale(d.gdp)}
-              y={yScale(d.lifeExpectancy)}
-              r={rScale(d.population)}
-              position={
-                d.country === 'China' || d.country === 'India' ? 'top' : 'right'
-              }
-            >
-              {d.country}
-            </Annotation>
-          ))}
         </g>
       </svg>
     </div>

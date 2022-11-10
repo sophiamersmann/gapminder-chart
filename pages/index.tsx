@@ -110,6 +110,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
             'Central African Republic',
             'Qatar',
           ]}
+          highlightedCountry="China"
           domainX={[500, 200000]}
           domainY={[10, max(data, (d) => d.lifeExpectancy) as number]}
           rangeR={[4, 40]}
