@@ -67,13 +67,13 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
   return (
     <div>
       <Head>
-        <title>Gapminder Chart: Health and Wealth of Nations</title>
+        <title>Gapminder Chart</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
         <hgroup style={{ marginBottom: 'var(--s-rem-3)' }}>
-          <h1>Health and Wealth of Nations</h1>
+          <h1>Health and Wealth of Nations — from then to now</h1>
           <p>Subtitle</p>
         </hgroup>
 
@@ -99,7 +99,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
 
         <GapminderChart
           data={data}
-          highlightedCountries={[
+          annotatedCountries={[
             'China',
             'India',
             'Russia',

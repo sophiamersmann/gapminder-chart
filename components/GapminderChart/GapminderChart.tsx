@@ -16,7 +16,7 @@ import styles from './GapminderChart.module.css';
 interface Props {
   data: DataRow[];
   year?: number;
-  highlightedCountries?: string[];
+  annotatedCountries?: string[];
   domainX?: [number, number];
   domainY?: [number, number];
   domainR?: [number, number];
@@ -29,7 +29,7 @@ interface Props {
 
 export default function GapminderChart({
   data,
-  highlightedCountries = [],
+  annotatedCountries = [],
   year,
   domainX,
   domainY,
@@ -71,12 +71,12 @@ export default function GapminderChart({
   );
 
   // get data for each country to highlight
-  const highlightedData = useMemo(
+  const annotations = useMemo(
     () =>
       displayData
-        .filter((d) => highlightedCountries.includes(d.country))
+        .filter((d) => annotatedCountries.includes(d.country))
         .sort((a, b) => ascending(a.population, b.population)),
-    [displayData, highlightedCountries]
+    [displayData, annotatedCountries]
   );
 
   // ticks
@@ -135,7 +135,7 @@ export default function GapminderChart({
           </Label>
 
           {/* annotate given countries */}
-          {highlightedData.map((d) => (
+          {annotations.map((d) => (
             <Annotation
               key={d.country}
               x={xScale(d.gdp)}
