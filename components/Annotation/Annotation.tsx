@@ -6,7 +6,7 @@ interface Props {
   x: number;
   y: number;
   r: number;
-  position?: 'right' | 'top';
+  position?: 'right' | 'top' | 'bottom';
   children: ReactNode;
 }
 
@@ -27,12 +27,21 @@ export default function Annotation({
   } else if (position === 'top') {
     y -= r;
     dx = '-10px';
+  } else if (position === 'bottom') {
+    y += r;
+    dy = '1em';
   }
+
+  const textAnchor = {
+    top: 'end',
+    right: 'start',
+    bottom: 'middle',
+  } as const;
 
   return (
     <text
       className={[styles.annotation, 'text-outline-sm'].join(' ')}
-      style={{ textAnchor: position === 'top' ? 'end' : 'start' }}
+      style={{ textAnchor: textAnchor[position] }}
       x={x}
       y={y}
       dx={dx}

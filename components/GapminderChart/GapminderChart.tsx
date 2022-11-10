@@ -6,6 +6,7 @@ import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
 import Label from '../Axis/Label';
 import Scatter from '../Scatter/Scatter';
+import HistoryPath from '../HistoryPath/HistoryPath';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
 import { translate } from '../../lib/utils';
@@ -72,15 +73,6 @@ export default function GapminderChart({
     [data, year]
   );
 
-  // get data for annotations
-  const annotations = useMemo(
-    () =>
-      displayData
-        .filter((d) => annotatedCountries.includes(d.country))
-        .sort((a, b) => ascending(a.population, b.population)),
-    [displayData, annotatedCountries]
-  );
-
   // get history data for the country to highlight
   const historyData = useMemo(() => {
     if (!highlightedCountry) return;
@@ -113,14 +105,25 @@ export default function GapminderChart({
             format={(tick) => '$' + tick / 1000 + 'k'}
           />
 
-          <Scatter
-            data={displayData}
-            xScale={xScale}
-            yScale={yScale}
-            rScale={rScale}
-            color={color}
-            annotatedCountries={annotatedCountries}
-          />
+          {/* if a country to highlight is specified, shoe its history. Else, render a scatter plot of all countries */}
+          {highlightedCountry && historyData ? (
+            <HistoryPath
+              data={historyData}
+              x={(d: DataRow) => xScale(d.gdp)}
+              y={(d: DataRow) => yScale(d.lifeExpectancy)}
+              r={(d: DataRow) => rScale(d.population)}
+              color={color(historyData[0])}
+            />
+          ) : (
+            <Scatter
+              data={displayData}
+              xScale={xScale}
+              yScale={yScale}
+              rScale={rScale}
+              color={color}
+              annotatedCountries={annotatedCountries}
+            />
+          )}
 
           {/* axis labels, rendered last to make sure they're are on top of the shapes */}
           <Label
