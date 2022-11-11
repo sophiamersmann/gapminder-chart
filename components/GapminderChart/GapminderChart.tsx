@@ -4,7 +4,7 @@ import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
 import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
-import Label from '../Axis/Label';
+import AxisLabel from '../Axis/AxisLabel';
 import Scatter from '../Scatter/Scatter';
 import HistoryPath from '../HistoryPath/HistoryPath';
 import HtmlAnnotation from '../Annotation/HtmlAnnotation';
@@ -27,7 +27,10 @@ interface Props {
   minorTicksX?: number[];
   majorTicksX?: number[];
   ticksY?: number[];
-  ticksZ?: { value: number; label: string }[];
+  ticksZ?: number[];
+  tickFormatX?: (v: number) => string;
+  tickFormatY?: (v: number) => string;
+  tickFormatZ?: (v: number) => string;
   color?: (d: DataRow) => string;
 }
 
@@ -39,11 +42,14 @@ export default function GapminderChart({
   domainX,
   domainY,
   domainR,
-  rangeR,
+  rangeR = [2, 10],
   minorTicksX,
   majorTicksX,
   ticksY,
   ticksZ = [],
+  tickFormatX = (v) => v.toString(),
+  tickFormatY = (v) => v.toString(),
+  tickFormatZ = (v) => v.toString(),
   color = () => 'var(--c-blue)',
 }: Props) {
   // internal configurations
@@ -59,27 +65,27 @@ export default function GapminderChart({
   const margins = { bottom: 20, left: 20, right: 60 };
   const { ref, dimensions: dms } = useChartDimensions<HTMLDivElement>(margins);
 
+  // if no year given, grab the most recent one
+  year = year || max(data, (d) => d.year);
+
+  // infer domains from data if necessary
+  domainX = domainX || (extent(data, (d) => d.gdp) as [number, number]);
+  domainY =
+    domainY || (extent(data, (d) => d.lifeExpectancy) as [number, number]);
+  domainR = domainR || (extent(data, (d) => d.population) as [number, number]);
+
   // scales
-  const xScale = scaleLog()
-    .domain(domainX || (extent(data, (d) => d.gdp) as [number, number]))
-    .range([0, dms.boundedWidth]);
+  const xScale = scaleLog().domain(domainX).range([0, dms.boundedWidth]);
   const yScale = scaleLinear()
-    .domain(
-      domainY || (extent(data, (d) => d.lifeExpectancy) as [number, number])
-    )
+    .domain(domainY)
     .range([dms.boundedHeight, 0])
     .nice();
-  const rScale = scaleSqrt()
-    .domain(domainR || (extent(data, (d) => d.population) as [number, number]))
-    .range(rangeR || [2, 10]);
+  const rScale = scaleSqrt().domain(domainR).range(rangeR);
 
   // shortcuts
   const xGet = (d: DataRow) => xScale(d.gdp);
   const yGet = (d: DataRow) => yScale(d.lifeExpectancy);
   const rGet = (d: DataRow) => rScale(d.population);
-
-  // if no year given, grab the most recent one
-  year = year || max(data, (d) => d.year);
 
   // filter data for the given year
   const displayData = useMemo(
@@ -97,23 +103,20 @@ export default function GapminderChart({
       .filter((d) => d.country === highlightedCountry)
       .sort((a, b) => ascending(a.year, b.year));
   }, [data, highlightedCountry]);
-
-  // show history data when there are at least two data points
-  const showHistory = historyData && historyData.length > 1;
+  const showHistory = historyData && historyData.length >= 1;
 
   // y-ticks
   ticksY = ticksY || yScale.ticks();
   const maxTickY = ticksY[ticksY.length - 1];
-  const tickFormatY = (tick: number) => tick.toString();
 
   // z-ticks
-  let tickDataZ: { data: DataRow; label: string }[] = [];
+  let tickDataZ: DataRow[] = [];
   if (showHistory) {
     const dataMap = new Map(historyData.map((d) => [d.year, d]));
     for (let i = 0; i < ticksZ.length; i++) {
-      const { value, label } = ticksZ[i];
-      if (dataMap.has(value)) {
-        tickDataZ.push({ data: dataMap.get(value) as DataRow, label });
+      const year = ticksZ[i];
+      if (dataMap.has(year)) {
+        tickDataZ.push(dataMap.get(year) as DataRow);
       }
     }
   }
@@ -134,10 +137,10 @@ export default function GapminderChart({
             ticks={minorTicksX}
             majorTicks={majorTicksX}
             y={dms.boundedHeight}
-            format={(tick) => '$' + tick / 1000 + 'k'}
+            format={tickFormatX}
           />
 
-          {/* show the history of a single country if specified */}
+          {/* if a country is selected, show its history */}
           {showHistory ? (
             <HistoryPath
               data={historyData}
@@ -160,21 +163,21 @@ export default function GapminderChart({
             />
           )}
 
-          {/* axis labels, rendered last to make sure they're are on top of the shapes */}
-          <Label
+          {/* axis labels are rendered last to make sure they're are on top of the shapes */}
+          <AxisLabel
             x={dms.boundedWidth}
             y={dms.boundedHeight}
             dy="-8"
             xAlign="right"
           >
             Income per person
-          </Label>
-          <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
+          </AxisLabel>
+          <AxisLabel x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
             {tickFormatY(maxTickY)} years
             <tspan x={-dms.margins.left} dy="1.1em">
               Life expectancy
             </tspan>
-          </Label>
+          </AxisLabel>
         </g>
       </svg>
 
@@ -203,7 +206,7 @@ export default function GapminderChart({
         )}
 
         {/* ticks labels along the history path */}
-        {tickDataZ.map(({ data: d, label }) => (
+        {tickDataZ.map((d) => (
           <HtmlAnnotation
             key={d.year}
             dimensions={dms}
@@ -215,9 +218,7 @@ export default function GapminderChart({
             }
             y={yGet(d)}
           >
-            <span style={{ color: 'var(--c-gray-700)' }}>
-              {label} ({d.year})
-            </span>
+            <span className={styles.tickZ}>{tickFormatZ(d.year)}</span>
           </HtmlAnnotation>
         ))}
       </div>

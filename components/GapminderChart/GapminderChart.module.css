@@ -9,3 +9,7 @@
 .htmlCanvas {
   position: absolute;
 }
+
+.tickZ {
+  color: var(--c-gray-700);
+}

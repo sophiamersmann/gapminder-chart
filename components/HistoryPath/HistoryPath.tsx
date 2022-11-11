@@ -12,7 +12,7 @@ interface Props {
   xGet: (d: DataRow) => number;
   yGet: (d: DataRow) => number;
   rGet: (d: DataRow) => number;
-  ticks?: { data: DataRow; label: string }[];
+  ticks?: DataRow[];
   color?: string;
   config?: { arrowLength: number; annotationRadius: number; padding: number };
 }
@@ -36,8 +36,9 @@ export default function HistoryPath({
 
   const line = d3line<DataRow>().x(xGet).y(yGet);
 
-  const first = data.length > 0 && data[0];
-  const last = data.length > 1 && data[data.length - 1];
+  // only show the first data point if there are at least two points
+  const first = data.length >= 2 && data[0];
+  const last = data.length > 0 && data[data.length - 1];
 
   return (
     <g>
@@ -74,8 +75,8 @@ export default function HistoryPath({
         <Circle x={xGet(last)} y={yGet(last)} r={rGet(last)} color={color} />
       )}
 
-      {/* ticks */}
-      {ticks.map(({ data: d }) => (
+      {/* ticks (indicator and arrow) */}
+      {ticks.map((d) => (
         <Fragment key={d.year}>
           <circle
             cx={xGet(d)}

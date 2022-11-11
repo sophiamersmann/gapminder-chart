@@ -13,14 +13,17 @@
     "format": "prettier --write --ignore-path .gitignore ."
   },
   "dependencies": {
+    "chroma-js": "^2.4.2",
     "d3-array": "^3.2.0",
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.1.0",
     "next": "13.0.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-select": "^5.6.0"
   },
   "devDependencies": {
+    "@types/chroma-js": "^2.1.4",
     "@types/d3-array": "^3.0.3",
     "@types/d3-dsv": "^3.0.0",
     "@types/d3-scale": "^4.0.2",

@@ -1,14 +1,18 @@
 import Head from 'next/head';
-import { GetStaticProps, NextPage } from 'next';
+import type { GetStaticProps, NextPage } from 'next';
+import { useState } from 'react';
+
 import { csvParse } from 'd3-dsv';
 import { max } from 'd3-array';
 import { scaleOrdinal } from 'd3-scale';
 
 import GapminderChart from '../components/GapminderChart/GapminderChart';
+import GroupedSelect from '../components/GroupedSelect/GroupedSelect';
 import Legend from '../components/Legend/Legend';
 import LegendItem from '../components/Legend/LegendItem';
 
 import { readFileSync } from '../lib/server';
+import * as colors from '../styles/colors';
 import type { DataRow } from '../types';
 
 // read data upfront (at build time)
@@ -44,25 +48,28 @@ interface IndexProps {
 }
 
 const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
+  const [selectedCountry, setSelectedCountry] = useState<string>();
+
   // quick access to a country's continent
   const continentMap = new Map(continents.map((d) => [d.country, d.continent]));
 
   // hand-pick continent colors (and their order)
   const continentColors = [
-    { continent: 'Africa', color: 'var(--c-purple)' },
-    { continent: 'Asia', color: 'var(--c-red)' },
-    { continent: 'Oceania', color: 'var(--c-yellow)' },
-    { continent: 'North America', color: 'var(--c-turquoise)' },
-    { continent: 'South America', color: 'var(--c-green)' },
-    { continent: 'Europe', color: 'var(--c-blue)' },
-    { continent: 'Antarctica', color: 'var(--c-beige)' },
+    { continent: 'Africa', color: colors.cPurple },
+    { continent: 'Asia', color: colors.cRed },
+    { continent: 'Oceania', color: colors.cYellow },
+    { continent: 'North America', color: colors.cTurquoise },
+    { continent: 'South America', color: colors.cGreen },
+    { continent: 'Europe', color: colors.cBlue },
+    { continent: 'Antarctica', color: colors.cBeige },
   ];
 
+  // color scale
   const uniqueContinents = continentColors.map((d) => d.continent);
-  const color = scaleOrdinal<string, string>()
+  const continentColor = scaleOrdinal<string, string>()
     .domain(uniqueContinents)
     .range(continentColors.map((d) => d.color))
-    .unknown('var(--c-black)');
+    .unknown(colors.cBlack);
 
   return (
     <div>
@@ -72,10 +79,36 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
       </Head>
 
       <main>
-        <hgroup style={{ marginBottom: 'var(--s-rem-3)' }}>
-          <h1>Health and Wealth of Nations — from then to now</h1>
-          <p>Subtitle</p>
-        </hgroup>
+        <h1 style={{ marginBottom: 'var(--s-rem-4)' }}>
+          Health and Wealth of Nations — from then to now
+        </h1>
+
+        <div style={{ marginBottom: 'var(--s-rem-7)' }}>
+          <GroupedSelect
+            id="select-country"
+            label={
+              <>
+                Explore how a country&apos;s health and wealth has{' '}
+                <b>changed over time:</b>
+              </>
+            }
+            placeholder="Select a country..."
+            values={[...new Set(data.map((d) => d.country))]}
+            selectedValue={selectedCountry}
+            setSelectedValue={setSelectedCountry}
+            group={(country: string) => continentMap.get(country) as string}
+            color={(country: string) =>
+              continentColor(continentMap.get(country) as string)
+            }
+            examples={[
+              'United States',
+              'United Kingdom',
+              'Italy',
+              'Qatar',
+              'South Africa',
+            ]}
+          />
+        </div>
 
         <div
           style={{
@@ -86,7 +119,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
         >
           <Legend>
             {uniqueContinents.map((continent) => (
-              <LegendItem key={continent} color={color(continent)}>
+              <LegendItem key={continent} color={continentColor(continent)}>
                 {continent}
               </LegendItem>
             ))}
@@ -110,7 +143,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
             'Central African Republic',
             'Qatar',
           ]}
-          highlightedCountry="United States"
+          highlightedCountry={selectedCountry}
           domainX={[500, 200000]}
           domainY={[10, max(data, (d) => d.lifeExpectancy) as number]}
           rangeR={[4, 40]}
@@ -120,11 +153,21 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           ]}
           majorTicksX={[1000, 10000, 100000]}
           ticksY={[20, 30, 40, 50, 60, 70, 80, 90]}
-          ticksZ={[
-            { value: 1918, label: 'End of World War I' },
-            { value: 1945, label: 'End of World War II' },
-          ]}
-          color={(d: DataRow) => color(continentMap.get(d.country) as string)}
+          ticksZ={[1918, 1945]}
+          tickFormatX={(tick) => '$' + tick / 1000 + 'k'}
+          tickFormatZ={(tick: number) => {
+            switch (tick) {
+              case 1918:
+                return `End of World War I (${tick})`;
+              case 1945:
+                return `End of World War II (${tick})`;
+              default:
+                return tick.toString();
+            }
+          }}
+          color={(d: DataRow) =>
+            continentColor(continentMap.get(d.country) as string)
+          }
         />
 
         <p
@@ -136,7 +179,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           }}
         >
           Source:{' '}
-          <a href="https://www.gapminder.org/" rel="noreferrer">
+          <a href="https://www.gapminder.org/" target="_blank" rel="noreferrer">
             Gapminder
           </a>
         </p>
