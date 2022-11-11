@@ -1,6 +1,6 @@
 import { line as d3line } from 'd3-shape';
 
-import Annotation from '../Annotation/Annotation';
+import SvgAnnotation from '../Annotation/SvgAnnotation';
 import Circle from '../Scatter/Circle';
 import Arrow from '../Arrow/Arrow';
 
@@ -9,35 +9,35 @@ import { Fragment } from 'react';
 
 interface Props {
   data: DataRow[];
-  x: (d: DataRow) => number;
-  y: (d: DataRow) => number;
-  r: (d: DataRow) => number;
-  ticks?: { year: number; label: string }[];
+  xGet: (d: DataRow) => number;
+  yGet: (d: DataRow) => number;
+  rGet: (d: DataRow) => number;
+  ticks?: { data: DataRow; label: string }[];
   color?: string;
+  config?: { arrowLength: number; annotationRadius: number; padding: number };
 }
 
 export default function HistoryPath({
   data,
-  x,
-  y,
-  r,
+  xGet,
+  yGet,
+  rGet,
   ticks = [],
   color = 'var(--c-black)',
+  config,
 }: Props) {
-  const arrowLength = 24;
-  const annotationRadius = 6;
-  const padding = 4;
+  // set default configuration if not given
+  const cfg = {
+    arrowLength: 24,
+    annotationRadius: 6,
+    padding: 4,
+    ...config,
+  };
 
-  const line = d3line<DataRow>().x(x).y(y);
+  const line = d3line<DataRow>().x(xGet).y(yGet);
 
   const first = data.length > 0 && data[0];
   const last = data.length > 1 && data[data.length - 1];
-
-  const dataMap = new Map(data.map((d) => [d.year, d]));
-  const tickData = ticks.map((tick) => ({
-    data: dataMap.get(tick.year),
-    label: tick.label,
-  }));
 
   return (
     <g>
@@ -49,53 +49,50 @@ export default function HistoryPath({
         fill="none"
       />
 
-      {/* first data point */}
+      {/* first data point (and annotation) */}
       {first && (
         <g>
-          <Circle x={x(first)} y={y(first)} r={r(first)} color={color} />
-          <Annotation x={x(first)} y={y(first)} r={r(first)} position="bottom">
+          <Circle
+            x={xGet(first)}
+            y={yGet(first)}
+            r={rGet(first)}
+            color={color}
+          />
+          <SvgAnnotation
+            x={xGet(first)}
+            y={yGet(first)}
+            r={rGet(first)}
+            position="bottom"
+          >
             <tspan style={{ fontWeight: 'bold' }}>{first.year}</tspan>
-          </Annotation>
+          </SvgAnnotation>
         </g>
       )}
 
       {/* last data point */}
       {last && (
-        <g>
-          <Circle x={x(last)} y={y(last)} r={r(last)} color={color} />
-          <Annotation x={x(last)} y={y(last)} r={r(last)}>
-            <tspan style={{ fontWeight: 'bold' }}>{last.year}</tspan>{' '}
-            {last.country}
-          </Annotation>
-        </g>
+        <Circle x={xGet(last)} y={yGet(last)} r={rGet(last)} color={color} />
       )}
 
-      {tickData.map(
-        ({ data: d, label }) =>
-          d && (
-            <Fragment key={d.year}>
-              <circle
-                cx={x(d)}
-                cy={y(d)}
-                r={annotationRadius}
-                stroke="var(--c-black)"
-                fill="none"
-              />
-              <Arrow
-                start={[x(d) + annotationRadius + padding, y(d)]}
-                end={[x(d) + annotationRadius + padding + arrowLength, y(d)]}
-              />
-              <Annotation x={x(d)} y={y(d)}>
-                <tspan
-                  dx={arrowLength + annotationRadius + 2 * padding}
-                  fill="var(--c-gray-700)"
-                >
-                  {label} ({d.year})
-                </tspan>
-              </Annotation>
-            </Fragment>
-          )
-      )}
+      {/* ticks */}
+      {ticks.map(({ data: d }) => (
+        <Fragment key={d.year}>
+          <circle
+            cx={xGet(d)}
+            cy={yGet(d)}
+            r={cfg.annotationRadius}
+            stroke="var(--c-black)"
+            fill="none"
+          />
+          <Arrow
+            start={[xGet(d) + cfg.annotationRadius + cfg.padding, yGet(d)]}
+            end={[
+              xGet(d) + cfg.annotationRadius + cfg.padding + cfg.arrowLength,
+              yGet(d),
+            ]}
+          />
+        </Fragment>
+      ))}
     </g>
   );
 }

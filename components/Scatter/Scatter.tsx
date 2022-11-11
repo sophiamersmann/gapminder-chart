@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { ascending } from 'd3-array';
-import type { ScaleContinuousNumeric } from 'd3-scale';
 
-import Annotation from '../Annotation/Annotation';
+import SvgAnnotation from '../Annotation/SvgAnnotation';
 import Circle from './Circle';
 
 import type { DataRow } from '../../types';
@@ -10,18 +9,18 @@ import type { DataRow } from '../../types';
 interface Props {
   data: DataRow[];
   annotatedCountries?: string[];
-  xScale: ScaleContinuousNumeric<number, number>;
-  yScale: ScaleContinuousNumeric<number, number>;
-  rScale: ScaleContinuousNumeric<number, number>;
+  xGet: (d: DataRow) => number;
+  yGet: (d: DataRow) => number;
+  rGet: (d: DataRow) => number;
   color?: (d: DataRow) => string;
 }
 
 export default function Scatter({
   data,
   annotatedCountries = [],
-  xScale,
-  yScale,
-  rScale,
+  xGet,
+  yGet,
+  rGet,
   color = () => 'var(--c-blue)',
 }: Props) {
   // get data for annotations
@@ -39,9 +38,9 @@ export default function Scatter({
         {data.map((d) => (
           <Circle
             key={d.country}
-            x={xScale(d.gdp)}
-            y={yScale(d.lifeExpectancy)}
-            r={rScale(d.population)}
+            x={xGet(d)}
+            y={yGet(d)}
+            r={rGet(d)}
             color={color(d)}
           />
         ))}
@@ -49,17 +48,17 @@ export default function Scatter({
 
       {/* annotate given countries */}
       {annotations.map((d) => (
-        <Annotation
+        <SvgAnnotation
           key={d.country}
-          x={xScale(d.gdp)}
-          y={yScale(d.lifeExpectancy)}
-          r={rScale(d.population)}
+          x={xGet(d)}
+          y={yGet(d)}
+          r={rGet(d)}
           position={
             d.country === 'China' || d.country === 'India' ? 'top' : 'right'
           }
         >
           {d.country}
-        </Annotation>
+        </SvgAnnotation>
       ))}
     </g>
   );

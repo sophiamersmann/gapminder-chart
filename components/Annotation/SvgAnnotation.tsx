@@ -10,15 +10,15 @@ interface Props {
   children: ReactNode;
 }
 
-export default function Annotation({
+export default function SvgAnnotation({
   x,
   y,
   r = 0,
   position = 'right',
   children,
 }: Props) {
-  let dx = '0';
-  let dy = '0';
+  let dx = '0px';
+  let dy = '0px';
 
   if (position === 'right') {
     x += r;

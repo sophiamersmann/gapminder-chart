@@ -1,3 +1,11 @@
+.chart {
+  position: relative;
+}
+
 .svg {
   overflow: visible;
+}
+
+.htmlCanvas {
+  position: absolute;
 }

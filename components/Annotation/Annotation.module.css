@@ -1,3 +1,8 @@
 .annotation {
   font-size: var(--font-size-sm);
 }
+
+div.annotation {
+  position: absolute;
+  line-height: 1;
+}

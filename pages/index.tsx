@@ -120,6 +120,10 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           ]}
           majorTicksX={[1000, 10000, 100000]}
           ticksY={[20, 30, 40, 50, 60, 70, 80, 90]}
+          ticksZ={[
+            { value: 1918, label: 'End of World War I' },
+            { value: 1945, label: 'End of World War II' },
+          ]}
           color={(d: DataRow) => color(continentMap.get(d.country) as string)}
         />
 

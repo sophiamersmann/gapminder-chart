@@ -8,4 +8,4 @@ export interface DataRow {
   population: number;
 }
 
-export type Dimensions = ReturnType<typeof useChartDimensions>;
+export type Dimensions = ReturnType<typeof useChartDimensions>['dimensions'];
