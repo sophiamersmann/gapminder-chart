@@ -4,11 +4,13 @@ import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
 import AxisX from '../Axis/AxisX';
 import AxisY from '../Axis/AxisY';
-import Label from '../Axis/Label';
-import Annotation from '../Annotation/Annotation';
+import AxisLabel from '../Axis/AxisLabel';
+import Scatter from '../Scatter/Scatter';
+import HistoryPath from '../HistoryPath/HistoryPath';
+import HtmlAnnotation from '../Annotation/HtmlAnnotation';
 
 import useChartDimensions from '../../lib/hooks/useChartDimensions';
-import { translate } from '../../lib/utils';
+import { px, translate } from '../../lib/utils';
 import type { DataRow } from '../../types';
 
 import styles from './GapminderChart.module.css';
@@ -16,7 +18,8 @@ import styles from './GapminderChart.module.css';
 interface Props {
   data: DataRow[];
   year?: number;
-  highlightedCountries?: string[];
+  annotatedCountries?: string[];
+  highlightedCountry?: string;
   domainX?: [number, number];
   domainY?: [number, number];
   domainR?: [number, number];
@@ -24,42 +27,65 @@ interface Props {
   minorTicksX?: number[];
   majorTicksX?: number[];
   ticksY?: number[];
+  ticksZ?: number[];
+  tickFormatX?: (v: number) => string;
+  tickFormatY?: (v: number) => string;
+  tickFormatZ?: (v: number) => string;
   color?: (d: DataRow) => string;
 }
 
 export default function GapminderChart({
   data,
-  highlightedCountries = [],
+  annotatedCountries = [],
+  highlightedCountry,
   year,
   domainX,
   domainY,
   domainR,
-  rangeR,
+  rangeR = [2, 10],
   minorTicksX,
   majorTicksX,
   ticksY,
+  ticksZ = [],
+  tickFormatX = (v) => v.toString(),
+  tickFormatY = (v) => v.toString(),
+  tickFormatZ = (v) => v.toString(),
   color = () => 'var(--c-blue)',
 }: Props) {
+  // internal configurations
+  const cfg = {
+    ticksZ: {
+      arrowLength: 24,
+      annotationRadius: 6,
+      padding: 4,
+    },
+  };
+
   // dimensions
   const margins = { bottom: 20, left: 20, right: 60 };
   const { ref, dimensions: dms } = useChartDimensions<HTMLDivElement>(margins);
 
-  // scales
-  const xScale = scaleLog()
-    .domain(domainX || (extent(data, (d) => d.gdp) as [number, number]))
-    .range([0, dms.boundedWidth]);
-  const yScale = scaleLinear()
-    .domain(
-      domainY || (extent(data, (d) => d.lifeExpectancy) as [number, number])
-    )
-    .range([dms.boundedHeight, 0])
-    .nice();
-  const rScale = scaleSqrt()
-    .domain(domainR || (extent(data, (d) => d.population) as [number, number]))
-    .range(rangeR || [2, 10]);
-
   // if no year given, grab the most recent one
   year = year || max(data, (d) => d.year);
+
+  // infer domains from data if necessary
+  domainX = domainX || (extent(data, (d) => d.gdp) as [number, number]);
+  domainY =
+    domainY || (extent(data, (d) => d.lifeExpectancy) as [number, number]);
+  domainR = domainR || (extent(data, (d) => d.population) as [number, number]);
+
+  // scales
+  const xScale = scaleLog().domain(domainX).range([0, dms.boundedWidth]);
+  const yScale = scaleLinear()
+    .domain(domainY)
+    .range([dms.boundedHeight, 0])
+    .nice();
+  const rScale = scaleSqrt().domain(domainR).range(rangeR);
+
+  // shortcuts
+  const xGet = (d: DataRow) => xScale(d.gdp);
+  const yGet = (d: DataRow) => yScale(d.lifeExpectancy);
+  const rGet = (d: DataRow) => rScale(d.population);
 
   // filter data for the given year
   const displayData = useMemo(
@@ -70,22 +96,33 @@ export default function GapminderChart({
     [data, year]
   );
 
-  // get data for each country to highlight
-  const highlightedData = useMemo(
-    () =>
-      displayData
-        .filter((d) => highlightedCountries.includes(d.country))
-        .sort((a, b) => ascending(a.population, b.population)),
-    [displayData, highlightedCountries]
-  );
+  // get history data for the country to highlight (if given)
+  const historyData = useMemo(() => {
+    if (!highlightedCountry) return;
+    return data
+      .filter((d) => d.country === highlightedCountry)
+      .sort((a, b) => ascending(a.year, b.year));
+  }, [data, highlightedCountry]);
+  const showHistory = historyData && historyData.length >= 1;
 
-  // ticks
+  // y-ticks
   ticksY = ticksY || yScale.ticks();
   const maxTickY = ticksY[ticksY.length - 1];
-  const tickFormatY = (tick: number) => tick.toString();
+
+  // z-ticks
+  let tickDataZ: DataRow[] = [];
+  if (showHistory) {
+    const dataMap = new Map(historyData.map((d) => [d.year, d]));
+    for (let i = 0; i < ticksZ.length; i++) {
+      const year = ticksZ[i];
+      if (dataMap.has(year)) {
+        tickDataZ.push(dataMap.get(year) as DataRow);
+      }
+    }
+  }
 
   return (
-    <div ref={ref}>
+    <div className={styles.chart} ref={ref}>
       <svg className={styles.svg} width={dms.width} height={dms.height}>
         <g transform={translate(dms.margins.left, dms.margins.top)}>
           <AxisY
@@ -100,56 +137,91 @@ export default function GapminderChart({
             ticks={minorTicksX}
             majorTicks={majorTicksX}
             y={dms.boundedHeight}
-            format={(tick) => '$' + tick / 1000 + 'k'}
+            format={tickFormatX}
           />
 
-          <g>
-            {displayData.map((d) => (
-              <circle
-                key={d.country}
-                cx={xScale(d.gdp)}
-                cy={yScale(d.lifeExpectancy)}
-                r={rScale(d.population)}
-                stroke="white"
-                strokeWidth="0.5"
-                fill={color(d)}
-                fillOpacity="0.8"
-              ></circle>
-            ))}
-          </g>
+          {/* if a country is selected, show its history */}
+          {showHistory ? (
+            <HistoryPath
+              data={historyData}
+              xGet={xGet}
+              yGet={yGet}
+              rGet={rGet}
+              color={color(historyData[0])}
+              ticks={tickDataZ}
+              config={cfg.ticksZ}
+            />
+          ) : (
+            // else, show a scatter plot with all countries for a given year
+            <Scatter
+              data={displayData}
+              xGet={xGet}
+              yGet={yGet}
+              rGet={rGet}
+              color={color}
+              annotatedCountries={annotatedCountries}
+            />
+          )}
 
-          {/* rendered last to make sure they're are on top of the shapes */}
-          <Label
+          {/* axis labels are rendered last to make sure they're are on top of the shapes */}
+          <AxisLabel
             x={dms.boundedWidth}
             y={dms.boundedHeight}
             dy="-8"
             xAlign="right"
           >
             Income per person
-          </Label>
-          <Label x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
+          </AxisLabel>
+          <AxisLabel x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
             {tickFormatY(maxTickY)} years
             <tspan x={-dms.margins.left} dy="1.1em">
               Life expectancy
             </tspan>
-          </Label>
-
-          {/* annotate given countries */}
-          {highlightedData.map((d) => (
-            <Annotation
-              key={d.country}
-              x={xScale(d.gdp)}
-              y={yScale(d.lifeExpectancy)}
-              r={rScale(d.population)}
-              position={
-                d.country === 'China' || d.country === 'India' ? 'top' : 'right'
-              }
-            >
-              {d.country}
-            </Annotation>
-          ))}
+          </AxisLabel>
         </g>
       </svg>
+
+      {/* html canvas with the same coordinate system as the svg */}
+      {/* multi-line labels are rendered here, so that we get line breaks for free */}
+      <div
+        className={styles.htmlCanvas}
+        style={{
+          width: px(dms.boundedWidth),
+          height: px(dms.boundedHeight),
+          top: px(dms.margins.top),
+          left: px(dms.margins.left),
+        }}
+      >
+        {/* label of the most recent data point when showing history data */}
+        {showHistory && (
+          <HtmlAnnotation
+            dimensions={dms}
+            x={xGet(historyData[historyData.length - 1])}
+            y={yGet(historyData[historyData.length - 1])}
+            r={rGet(historyData[historyData.length - 1])}
+          >
+            <b>{historyData[historyData.length - 1].year}</b>{' '}
+            {historyData[historyData.length - 1].country}
+          </HtmlAnnotation>
+        )}
+
+        {/* ticks labels along the history path */}
+        {tickDataZ.map((d) => (
+          <HtmlAnnotation
+            key={d.year}
+            dimensions={dms}
+            x={
+              xGet(d) +
+              cfg.ticksZ.arrowLength +
+              cfg.ticksZ.annotationRadius +
+              2 * cfg.ticksZ.padding
+            }
+            y={yGet(d)}
+          >
+            <span className={styles.tickZ}>{tickFormatZ(d.year)}</span>
+          </HtmlAnnotation>
+        ))}
+      </div>
     </div>
   );
 }

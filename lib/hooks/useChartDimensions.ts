@@ -1,6 +1,7 @@
 // adapted from https://wattenberger.com/blog/react-and-d3#sizing-responsivity
 
 import { useState, useRef, useEffect } from 'react';
+import { ResizeObserver } from '@juggle/resize-observer'; // polyfill
 
 interface Margins {
   top: number;

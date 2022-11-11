@@ -5,20 +5,20 @@ import styles from './Annotation.module.css';
 interface Props {
   x: number;
   y: number;
-  r: number;
-  position?: 'right' | 'top';
+  r?: number;
+  position?: 'right' | 'top' | 'bottom';
   children: ReactNode;
 }
 
-export default function Annotation({
+export default function SvgAnnotation({
   x,
   y,
-  r,
+  r = 0,
   position = 'right',
   children,
 }: Props) {
-  let dx = '0';
-  let dy = '0';
+  let dx = '0px';
+  let dy = '0px';
 
   if (position === 'right') {
     x += r;
@@ -27,12 +27,21 @@ export default function Annotation({
   } else if (position === 'top') {
     y -= r;
     dx = '-10px';
+  } else if (position === 'bottom') {
+    y += r;
+    dy = '1em';
   }
+
+  const textAnchor = {
+    top: 'end',
+    right: 'start',
+    bottom: 'middle',
+  } as const;
 
   return (
     <text
       className={[styles.annotation, 'text-outline-sm'].join(' ')}
-      style={{ textAnchor: position === 'top' ? 'end' : 'start' }}
+      style={{ textAnchor: textAnchor[position] }}
       x={x}
       y={y}
       dx={dx}

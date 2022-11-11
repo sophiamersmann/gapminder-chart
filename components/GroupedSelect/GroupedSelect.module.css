@@ -1,0 +1,62 @@
+.label {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--s-px-1);
+}
+
+.groupLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.examples {
+  display: flex;
+  gap: var(--s-px-1);
+
+  font-size: var(--font-size-xs);
+  margin-top: var(--s-rem-1);
+  color: var(--c-gray-700);
+}
+
+.btnExample {
+  /* reset user agent styles */
+  all: unset;
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0 var(--s-px-2);
+  border-radius: 12px;
+  background-color: var(--color-light);
+  margin-right: calc(0.5 * var(--s-px-1));
+  margin-bottom: calc(0.5 * var(--s-px-1));
+}
+
+/* re-apply focus styles that have been removed by 'all: unset' */
+.btnExample:focus-visible {
+  outline: 1.5px solid var(--c-focus);
+  outline-offset: 0.15em;
+}
+.btnExample:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.btnExample:last-of-type {
+  margin-right: 0;
+}
+
+.btnExample:hover {
+  color: var(--c-black);
+}
+
+/* small circle */
+.btnExample::before {
+  content: '';
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  margin-right: var(--s-px-1);
+  background-color: var(--color);
+}
