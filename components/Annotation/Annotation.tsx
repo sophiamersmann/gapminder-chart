@@ -5,7 +5,7 @@ import styles from './Annotation.module.css';
 interface Props {
   x: number;
   y: number;
-  r: number;
+  r?: number;
   position?: 'right' | 'top' | 'bottom';
   children: ReactNode;
 }
@@ -13,7 +13,7 @@ interface Props {
 export default function Annotation({
   x,
   y,
-  r,
+  r = 0,
   position = 'right',
   children,
 }: Props) {

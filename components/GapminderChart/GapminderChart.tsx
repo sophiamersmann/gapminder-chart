@@ -113,6 +113,10 @@ export default function GapminderChart({
               y={(d: DataRow) => yScale(d.lifeExpectancy)}
               r={(d: DataRow) => rScale(d.population)}
               color={color(historyData[0])}
+              ticks={[
+                { year: 1918, label: 'End of World War I' },
+                { year: 1945, label: 'End of World War II' },
+              ]}
             />
           ) : (
             <Scatter
