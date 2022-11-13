@@ -83,7 +83,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           Health and Wealth of Nations — Then and Now
         </h1>
 
-        <div style={{ marginBottom: 'var(--s-rem-7)' }}>
+        <div style={{ marginBottom: 'var(--s-rem-6)' }}>
           <GroupedSelect
             id="select-country"
             label={
