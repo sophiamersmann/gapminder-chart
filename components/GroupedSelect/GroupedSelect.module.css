@@ -31,6 +31,9 @@
   background-color: var(--color-light);
   margin-right: calc(0.5 * var(--s-px-1));
   margin-bottom: calc(0.5 * var(--s-px-1));
+
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 /* re-apply focus styles that have been removed by 'all: unset' */

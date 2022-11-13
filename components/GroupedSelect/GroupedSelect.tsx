@@ -57,20 +57,17 @@ export default function GroupedSelect<T extends { toString: () => string }>({
     false,
     SelectGroup<SelectOption<T>>
   > = {
-    control: (provided, state) => {
-      console.log(provided);
-      return {
-        ...provided,
-        fontSize: 'var(--font-size-sm)',
-        border: '1px solid var(--c-gray-400)',
-        '&:hover': {
-          borderColor: 'var(--c-gray-400)',
-        },
-        boxShadow: 'none',
-        outline: state.isFocused ? '1.5px solid var(--c-focus)' : '',
-        outlineOffset: '0.1em',
-      };
-    },
+    control: (provided, state) => ({
+      ...provided,
+      fontSize: 'var(--font-size-sm)',
+      border: '1px solid var(--c-gray-400)',
+      '&:hover': {
+        borderColor: 'var(--c-gray-400)',
+      },
+      boxShadow: 'none',
+      outline: state.isFocused ? '1.5px solid var(--c-focus)' : '',
+      outlineOffset: '0.1em',
+    }),
     singleValue: (provided, state) => ({
       ...provided,
       display: 'flex',
