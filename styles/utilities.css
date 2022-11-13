@@ -1,3 +1,4 @@
+/* from http://owumaro.github.io/text-stroke-generator/ */
 .text-outline {
   --text-outline: #ffffff;
   text-shadow: var(--text-outline) 3px 0px 0px,
@@ -21,6 +22,7 @@
     var(--text-outline) 2.8805108070373535px -0.8382465243339539px 0px;
 }
 
+/* from http://owumaro.github.io/text-stroke-generator/ */
 .text-outline-sm {
   --text-outline: #ffffff;
   text-shadow: var(--text-outline) 2px 0px 0px,
@@ -36,4 +38,15 @@
     var(--text-outline) 0.567324px -1.91785px 0px,
     var(--text-outline) 1.41734px -1.41108px 0px,
     var(--text-outline) 1.92034px -0.558831px 0px;
+}
+
+.visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
 }

@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { line as d3line } from 'd3-shape';
 
 import SvgAnnotation from '../Annotation/SvgAnnotation';
@@ -5,7 +6,6 @@ import Circle from '../Scatter/Circle';
 import Arrow from '../Arrow/Arrow';
 
 import { DataRow } from '../../types';
-import { Fragment } from 'react';
 
 interface Props {
   data: DataRow[];
