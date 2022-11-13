@@ -80,15 +80,15 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
 
       <main>
         <h1 style={{ marginBottom: 'var(--s-rem-4)' }}>
-          Health and Wealth of Nations — from then to now
+          Health and Wealth of Nations — Then and Now
         </h1>
 
-        <div style={{ marginBottom: 'var(--s-rem-7)' }}>
+        <div style={{ marginBottom: 'var(--s-rem-6)' }}>
           <GroupedSelect
             id="select-country"
             label={
               <>
-                Explore how a country&apos;s health and wealth has{' '}
+                Explore how a country&apos;s health and wealth have{' '}
                 <b>changed over time:</b>
               </>
             }
@@ -116,6 +116,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
             color: 'var(--c-gray-500)',
             fontSize: 'var(--font-size-sm)',
           }}
+          aria-hidden="true"
         >
           <Legend>
             {uniqueContinents.map((continent) => (
@@ -173,7 +174,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
         <p
           style={{
             fontSize: 'var(--font-size-xs)',
-            color: 'var(--c-gray-400)',
+            color: 'var(--c-gray-500)',
             lineHeight: 1,
             marginTop: 'var(--s-rem-2)',
           }}

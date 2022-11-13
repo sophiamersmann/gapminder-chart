@@ -12,7 +12,7 @@ interface Margins {
 
 const useChartDimensions = <E extends HTMLElement>(
   passedMargins: Partial<Margins> = {},
-  { ratio = 16 / 9, minHeight = 300, maxHeight = 400 } = {}
+  { initialWidth = 800, ratio = 16 / 9, minHeight = 300, maxHeight = 400 } = {}
 ) => {
   const ref = useRef<E>(null);
 
@@ -24,7 +24,7 @@ const useChartDimensions = <E extends HTMLElement>(
     left: passedMargins.left || 0,
   };
 
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useState(initialWidth);
 
   useEffect(() => {
     const element = ref.current as E;
