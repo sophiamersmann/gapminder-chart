@@ -1,7 +1,7 @@
 interface Props {
   x: number;
   y: number;
-  r: number;
+  r: number; // radius
   color?: string;
 }
 

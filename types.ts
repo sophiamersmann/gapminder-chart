@@ -9,3 +9,10 @@ export interface DataRow {
 }
 
 export type Dimensions = ReturnType<typeof useChartDimensions>['dimensions'];
+
+export type ColumnName =
+  | 'country'
+  | 'year'
+  | 'gdp_per_capita'
+  | 'life_expectancy'
+  | 'population';

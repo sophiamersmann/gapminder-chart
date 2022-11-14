@@ -9,9 +9,9 @@ interface Props {
 
 export default function LegendItem({ color, children }: Props) {
   return (
-    <div className={styles.item}>
+    <li className={styles.item}>
       <span className={styles.shape} style={{ backgroundColor: color }}></span>{' '}
       {children}
-    </div>
+    </li>
   );
 }

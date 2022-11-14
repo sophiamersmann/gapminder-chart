@@ -7,5 +7,5 @@ interface Props {
 }
 
 export default function Legend({ children }: Props) {
-  return <div className={styles.legend}>{children}</div>;
+  return <ul className={styles.legend}>{children}</ul>;
 }

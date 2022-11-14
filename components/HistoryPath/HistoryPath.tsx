@@ -12,7 +12,7 @@ interface Props {
   xGet: (d: DataRow) => number;
   yGet: (d: DataRow) => number;
   rGet: (d: DataRow) => number;
-  ticks?: DataRow[];
+  ticks?: DataRow[]; // ticks along the history path
   color?: string;
   config?: { arrowLength: number; annotationRadius: number; padding: number };
 }

@@ -1,9 +1,11 @@
 import type { Dispatch, ReactNode, SetStateAction, CSSProperties } from 'react';
 import ReactSelect, { StylesConfig } from 'react-select';
+
 import { rollups } from 'd3-array';
 import chroma from 'chroma-js';
 
 import { cBlack } from '../../styles/colors';
+
 import styles from './GroupedSelect.module.css';
 
 interface SelectOption<T> {
@@ -132,21 +134,24 @@ export default function GroupedSelect<T extends { toString: () => string }>({
         styles={selectStyles}
         aria-labelledby={`${id}-label`}
       />
+
+      {/* List of examples */}
       {examples.length > 0 && (
         <div className={styles.examples}>
           Examples:{' '}
-          <div>
+          <ul>
             {examples.map((example) => (
-              <Button
-                key={example.toString()}
-                value={example}
-                setValue={setSelectedValue}
-                color={color(example)}
-              >
-                {format(example)}
-              </Button>
+              <li key={example.toString()}>
+                <Button
+                  value={example}
+                  setValue={setSelectedValue}
+                  color={color(example)}
+                >
+                  {format(example)}
+                </Button>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </>

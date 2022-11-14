@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import type { GetStaticProps, NextPage } from 'next';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { csvParse } from 'd3-dsv';
 import { max } from 'd3-array';
@@ -13,23 +13,23 @@ import LegendItem from '../components/Legend/LegendItem';
 
 import { readFileSync } from '../lib/server';
 import * as colors from '../styles/colors';
-import type { DataRow } from '../types';
+import type { ColumnName, DataRow } from '../types';
 
 // read data upfront (at build time)
 export const getStaticProps: GetStaticProps = async (_context) => {
-  // GDP, life expectance and population by country and year
-  const data = csvParse<
-    DataRow,
-    'country' | 'year' | 'gdp_per_capita' | 'life_expectancy' | 'population'
-  >(readFileSync('data/data-by-country-and-year.csv'), (d) => ({
-    country: d.country as string,
-    year: +(d.year as string),
-    gdp: +(d.gdp_per_capita as string),
-    lifeExpectancy: +(d.life_expectancy as string),
-    population: +(d.population as string),
-  }));
+  // load from file: gdp, life expectance and population by country and year
+  const data = csvParse<DataRow, ColumnName>(
+    readFileSync('data/data-by-country-and-year.csv'),
+    (d) => ({
+      country: d.country as string,
+      year: +(d.year as string),
+      gdp: +(d.gdp_per_capita as string),
+      lifeExpectancy: +(d.life_expectancy as string),
+      population: +(d.population as string),
+    })
+  );
 
-  // continents by country
+  // load from file: continents by country
   const continents = csvParse<'country' | 'continent'>(
     readFileSync('data/continent-by-country.csv')
   );
@@ -51,7 +51,12 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
   const [selectedCountry, setSelectedCountry] = useState<string>();
 
   // quick access to a country's continent
-  const continentMap = new Map(continents.map((d) => [d.country, d.continent]));
+  const continentMap = useMemo(
+    () => new Map(continents.map((d) => [d.country, d.continent])),
+    [continents]
+  );
+  const getContinent = (country: string) =>
+    continentMap.has(country) ? (continentMap.get(country) as string) : 'Other';
 
   // hand-pick continent colors (and their order)
   const continentColors = [
@@ -83,6 +88,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           Health and Wealth of Nations — Then and Now
         </h1>
 
+        {/* Dropdown widget to select a country */}
         <div style={{ marginBottom: 'var(--s-rem-6)' }}>
           <GroupedSelect
             id="select-country"
@@ -96,10 +102,8 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
             values={[...new Set(data.map((d) => d.country))]}
             selectedValue={selectedCountry}
             setSelectedValue={setSelectedCountry}
-            group={(country: string) => continentMap.get(country) as string}
-            color={(country: string) =>
-              continentColor(continentMap.get(country) as string)
-            }
+            group={getContinent}
+            color={(country: string) => continentColor(getContinent(country))}
             examples={[
               'United States',
               'United Kingdom',
@@ -110,6 +114,7 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
           />
         </div>
 
+        {/* Chart legend */}
         <div
           style={{
             marginBottom: 'var(--s-rem-5)',
@@ -166,11 +171,10 @@ const IndexPage: NextPage<IndexProps> = ({ data, continents }: IndexProps) => {
                 return tick.toString();
             }
           }}
-          color={(d: DataRow) =>
-            continentColor(continentMap.get(d.country) as string)
-          }
+          color={(d: DataRow) => continentColor(getContinent(d.country))}
         />
 
+        {/* Source */}
         <p
           style={{
             fontSize: 'var(--font-size-xs)',

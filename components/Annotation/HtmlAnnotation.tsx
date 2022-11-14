@@ -8,7 +8,7 @@ interface Props {
   dimensions: Dimensions;
   x: number;
   y: number;
-  r?: number;
+  r?: number; // radius of the circle that is annotated (if applicable)
   position?: 'right';
   children: ReactNode;
 }

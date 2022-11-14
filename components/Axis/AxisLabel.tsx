@@ -5,8 +5,8 @@ import styles from './Axis.module.css';
 interface Props {
   x?: number;
   y?: number;
-  dx?: number | string;
-  dy?: number | string;
+  dx?: number | string; // shift along x-axis
+  dy?: number | string; // shift along y-axis
   xAlign?: 'left' | 'center' | 'right';
   children: ReactNode;
 }

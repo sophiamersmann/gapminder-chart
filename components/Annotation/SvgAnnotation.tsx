@@ -5,7 +5,7 @@ import styles from './Annotation.module.css';
 interface Props {
   x: number;
   y: number;
-  r?: number;
+  r?: number; // radius of the circle that is annotated (if applicable)
   position?: 'right' | 'top' | 'bottom';
   children: ReactNode;
 }

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { extent, max, descending, ascending } from 'd3-array';
 import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 
@@ -77,20 +78,20 @@ export default function GapminderChart({
   domainR = domainR || (extent(data, (d) => d.population) as [number, number]);
 
   // scales
-  const xScale = scaleLog().domain(domainX).range([0, dms.boundedWidth]);
-  const yScale = scaleLinear()
+  const scaleX = scaleLog().domain(domainX).range([0, dms.boundedWidth]);
+  const scaleY = scaleLinear()
     .domain(domainY)
     .range([dms.boundedHeight, 0])
     .nice();
-  const rScale = scaleSqrt().domain(domainR).range(rangeR);
+  const scaleR = scaleSqrt().domain(domainR).range(rangeR);
 
   // shortcuts
-  const xGet = (d: DataRow) => xScale(d.gdp);
-  const yGet = (d: DataRow) => yScale(d.lifeExpectancy);
-  const rGet = (d: DataRow) => rScale(d.population);
+  const xGet = (d: DataRow) => scaleX(d.gdp);
+  const yGet = (d: DataRow) => scaleY(d.lifeExpectancy);
+  const rGet = (d: DataRow) => scaleR(d.population);
 
   // filter data for the given year
-  const displayData = useMemo(
+  const singleYearData = useMemo(
     () =>
       data
         .filter((d) => d.year === year)
@@ -108,7 +109,7 @@ export default function GapminderChart({
   const showHistory = historyData && historyData.length >= 1;
 
   // y-ticks
-  ticksY = ticksY || yScale.ticks();
+  ticksY = ticksY || scaleY.ticks();
   const maxTickY = ticksY[ticksY.length - 1];
 
   // z-ticks
@@ -125,6 +126,7 @@ export default function GapminderChart({
 
   return (
     <>
+      {/* visually hidden chart description for screen readers */}
       <div className="visually-hidden">
         <hgroup>
           <h2>Scatter plot: Health and Wealth of Nations</h2>
@@ -133,21 +135,22 @@ export default function GapminderChart({
         {showHistory ? (
           <HistoryPathDescription data={historyData} />
         ) : (
-          <ScatterDescription data={displayData} />
+          <ScatterDescription data={singleYearData} />
         )}
       </div>
+
       <div className={styles.chart} ref={ref} aria-hidden="true">
         <svg className={styles.svg} width={dms.width} height={dms.height}>
           <g transform={translate(dms.margins.left, dms.margins.top)}>
             <AxisY
-              yScale={yScale}
+              yScale={scaleY}
               ticks={ticksY}
               tickX={-dms.margins.left}
               tickLength={dms.boundedWidth}
               format={tickFormatY}
             />
             <AxisX
-              xScale={xScale}
+              xScale={scaleX}
               ticks={minorTicksX}
               majorTicks={majorTicksX}
               y={dms.boundedHeight}
@@ -166,9 +169,9 @@ export default function GapminderChart({
                 config={cfg.ticksZ}
               />
             ) : (
-              // else, show a scatter plot with all countries for a given year
+              // else, show a scatter plot with all countries for the given year
               <Scatter
-                data={displayData}
+                data={singleYearData}
                 xGet={xGet}
                 yGet={yGet}
                 rGet={rGet}
@@ -186,7 +189,7 @@ export default function GapminderChart({
             >
               Income per person
             </AxisLabel>
-            <AxisLabel x={-dms.margins.left} y={yScale(maxTickY)} dy="0.3em">
+            <AxisLabel x={-dms.margins.left} y={scaleY(maxTickY)} dy="0.3em">
               {tickFormatY(maxTickY)} years
               <tspan x={-dms.margins.left} dy="1.1em">
                 Life expectancy
@@ -194,6 +197,7 @@ export default function GapminderChart({
             </AxisLabel>
           </g>
         </svg>
+
         {/* html canvas with the same coordinate system as the svg */}
         {/* multi-line labels are rendered here, so that we get line breaks for free */}
         <div
